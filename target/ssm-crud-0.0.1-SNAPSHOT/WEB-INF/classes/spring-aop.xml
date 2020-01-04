@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+
+    <!--1、自动扫描所有的组件  -->
+    <context:component-scan base-package="com.atguigu.crud.**"></context:component-scan>
+    <!--2、开启基于注解的aop功能  -->
+    <aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+    <!--
+     0）、被代理对象也得先加入到ioc中
+     1）、编写日志切面，并加入到ioc中，@Component @Aspect
+     2）、给切面编写通知方法。
+     3）、加上何时何地切入的注解。切入点表达式
+     4）、开启基于注解的aop功能即可
+     -->
+
+
+
+    <!--
+1、<context:component-scan/>默认是将所有@Component注解的类扫描进容器; @Controller自身就是被@Component修饰的
+2、<mvc:annotation-driven /> 的解析工作是由 AnnotationDrivenBeanDefinitionParser 类全权负责的。
+3、AnnotationDrivenBeanDefinitionParser会向SpringMVC容器中注册了RequestMappingHandlerMapping (间接实现了HandlerMapping接口), order为0
+4、查看RequestMappingHandlerMapping 类的继承链就会发现, 其祖先类 AbstractHandlerMethodMapping<T>实现了 InitializingBean
+5、而对InitializingBean的实现中, 会回调RequestMappingHandlerMapping.isHandler的实现，在那里你就可以看到对@RequestMapping注解的扫描了.
+    -->
+
+</beans>

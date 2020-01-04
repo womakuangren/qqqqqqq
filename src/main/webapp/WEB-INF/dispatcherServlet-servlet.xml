@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:task="http://www.springframework.org/schema/task"
+	   xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+	<!--SpringMVC的配置文件，包含网站跳转逻辑的控制，配置  -->
+	<context:component-scan base-package="com.atguigu" use-default-filters="false">
+		<!--只扫描控制器。  -->
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	
+	<!--配置视图解析器，方便页面返回  -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+	
+	<!--两个标准配置  -->
+	<!-- 将springmvc不能处理的请求交给tomcat -->
+	<mvc:default-servlet-handler/>
+	<!-- 能支持springmvc更高级的一些功能，JSR303校验，快捷的ajax...映射动态请求 -->
+	<mvc:annotation-driven/>
+
+
+	<!--  spring异步任务配置  -->
+	<task:annotation-driven executor="targetExecutor" scheduler="targetScheduler"/>
+
+	<task:executor id="targetExecutor" pool-size="5"/>
+	<task:scheduler id="targetScheduler" pool-size="10"/>
+
+	<task:annotation-driven executor="threadPoolTaskExecutor" />
+	<bean id="threadPoolTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<!--核心线程数，默认为1 -->
+		<property name="corePoolSize" value="10" />
+		<!--最大线程数，默认为Integer.MAX_VALUE-->
+		<property name="maxPoolSize" value="50" />
+		<!--队列最大长度，一般需要设置值>=notifyScheduledMainExecutor.maxNum；默认为Integer.MAX_VALUE-->
+		<property name="queueCapacity" value="1000" />
+		<!--线程池维护线程所允许的空闲时间，默认为60s-->
+		<property name="keepAliveSeconds" value="300" />
+		<!-- 线程池对拒绝任务（无线程可用）的处理策略，目前只支持AbortPolicy、CallerRunsPolicy；默认为后者-->
+		<property name="rejectedExecutionHandler">
+			<!-- AbortPolicy:直接抛出java.util.concurrent.RejectedExecutionException异常-->
+			<!-- CallerRunsPolicy:主线程直接执行该任务，执行完之后尝试添加下一个任务到线程池中，可以有效降低向线程池内添加任务的速度-->
+			<!-- DiscardOldestPolicy:抛弃旧的任务、暂不支持；会导致被丢弃的任务无法再次被执行-->
+			<!-- DiscardPolicy:抛弃当前任务、暂不支持；会导致被丢弃的任务无法再次被执行-->
+			<bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy" />
+		</property>
+		<!-- 线程关闭策略,默认false,当值为true时,只有当子线程里面的任务完成时才会调用shutdown()来关闭现场 -->
+		<property name="waitForTasksToCompleteOnShutdown" value="true" />
+	</bean>
+
+
+</beans>
